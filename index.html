@@ -152,6 +152,73 @@ h1{text-align:center;margin:6px 0}
 
 .memory-note{font-size:12px;opacity:.85;text-align:center;margin:6px auto 10px;max-width:520px}
 
+
+/* ===== V12: layout realmente compacto para celular ===== */
+@media(max-width:700px){
+  html,body{overflow-x:hidden}
+  body{padding:2px}
+  .game{padding:10px 3px 18px}
+  .target{margin:8px 4px 5px;padding:8px}
+  .target b{font-size:17px;letter-spacing:1.5px}
+  .memory-note{font-size:11px;margin:4px 8px 8px}
+
+  .preview{
+    gap:3px;
+    margin:8px 2px 6px;
+  }
+  .slot{
+    width:25px;height:25px;
+    font-size:11px;
+  }
+
+  .board{
+    display:grid !important;
+    grid-template-columns:repeat(5,1fr) !important;
+    gap:0 !important;
+    width:100% !important;
+    max-width:390px !important;
+    margin:14px auto 8px !important;
+    padding:0 2px !important;
+    align-items:end !important;
+    justify-items:center !important;
+  }
+  .tube{
+    width:50px !important;
+    height:285px !important;
+    border-width:4px !important;
+    border-radius:0 0 20px 20px !important;
+  }
+  .tube.targetTube:after{
+    bottom:-22px !important;
+    font-size:8px !important;
+  }
+  .ball{
+    width:36px !important;
+    height:36px !important;
+    left:3px !important;
+    font-size:14px !important;
+  }
+  .ball:after{
+    width:9px !important;height:6px !important;
+    left:7px !important;top:6px !important;
+  }
+  .message{
+    margin-top:27px !important;
+    min-height:20px;
+    font-size:11px;
+  }
+  .help{
+    font-size:10px;
+    padding:7px;
+    margin:8px 4px;
+  }
+}
+@media(max-width:360px){
+  .board{max-width:350px !important}
+  .tube{width:45px !important;height:270px !important}
+  .ball{width:32px !important;height:32px !important;left:2px !important;font-size:13px !important}
+}
+
 </style>
 </head>
 <body>
@@ -283,7 +350,7 @@ function normalize(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').r
 function answerRiddle(){
   const g=normalize(document.getElementById('guessInput').value);
   if(!g){document.getElementById('riddleMsg').textContent='Digite um nome.';return}
-  if(g===target){
+  if(g===normalize(target)){
     score+=25;localStorage.setItem('bnc_score',score);
     document.getElementById('score').textContent=score;
     document.getElementById('riddleMsg').textContent='✅ Acertou! Preparando as bolinhas...';
@@ -297,11 +364,11 @@ function startBallGame(){
   document.getElementById('riddleScreen').classList.add('hidden');
   document.getElementById('gameArea').classList.remove('hidden');
 
-  const real=target.split('').map((l,i)=>({l,c:colors[(l.charCodeAt(0)+i)%colors.length],extra:false}));
+  const puzzle=normalize(target); const real=puzzle.split('').map((l,i)=>({l,c:colors[(l.charCodeAt(0)+i)%colors.length],extra:false}));
   const extras=makeExtraLetters(extraCount()).map((l,i)=>({l,c:colors[(i+target.length)%colors.length],extra:true}));
   const balls=mix([...real,...extras]);
 
-  const helpers=Math.max(4,Math.min(7,Math.ceil(balls.length/3)));
+  const helpers=(innerWidth<=700?4:Math.max(4,Math.min(7,Math.ceil(balls.length/3))));
   tubes=Array.from({length:helpers+1},()=>[]);
   balls.forEach((b,i)=>tubes[1+(i%helpers)].push(b));
   tubes.slice(1).forEach(t=>t.sort(()=>Math.random()-.5));
@@ -310,18 +377,18 @@ function startBallGame(){
 }
 function save(){history.push(JSON.stringify({tubes,moves}));if(history.length>100)history.shift()}
 function correctCount(){
-  const t=tubes[0];let n=0;
-  for(let i=0;i<t.length;i++){if(t[i].l===target[i] && !t[i].extra)n++;else break}
+  const puzzle=normalize(target); const t=tubes[0];let n=0;
+  for(let i=0;i<t.length;i++){if(t[i].l===puzzle[i] && !t[i].extra)n++;else break}
   return n
 }
 function render(){
   document.getElementById('level').textContent=level;
   document.getElementById('moves').textContent=moves;
   document.getElementById('score').textContent=score;
-  document.getElementById('name').textContent=target;
+  document.getElementById('name').textContent='MONTE O NOME';
 
   const p=document.getElementById('preview');p.innerHTML='';const cc=correctCount();
-  target.split('').forEach((l,i)=>{let s=document.createElement('div');s.className='slot'+(i<cc?' ok':'');s.textContent=l;p.appendChild(s)});
+  normalize(target).split('').forEach((l,i)=>{let s=document.createElement('div');s.className='slot'+(i<cc?' ok':'');s.textContent=(i<cc?'✓':'•');p.appendChild(s)});
 
   const board=document.getElementById('board');board.innerHTML='';
   tubes.forEach((t,ti)=>{
@@ -334,13 +401,13 @@ function render(){
       x.className='ball'+(b.extra?' extra':'');
       x.textContent=b.l;
       x.style.background=`linear-gradient(135deg,${b.c},#25364a)`;
-      let mob=innerWidth<=700,size=mob?40:54,gap=mob?7:9;
+      let mob=innerWidth<=700,size=mob?36:54,gap=mob?6:9;
       x.style.bottom=(gap+bi*(size+4))+'px';
       d.appendChild(x)
     });
     board.appendChild(d)
   });
-  document.getElementById('progress').style.width=(cc/target.length*100)+'%'
+  document.getElementById('progress').style.width=(cc/normalize(target).length*100)+'%'
 }
 function clickTube(i){
   if(selected===null){
@@ -354,7 +421,7 @@ function clickTube(i){
   const ball=from[from.length-1];
 
   if(i===0){
-    const expected=target[tubes[0].length];
+    const expected=normalize(target)[tubes[0].length];
     if(ball.extra || ball.l!==expected){
       selected=null;render();
       say('Essa bolinha não serve agora. A próxima letra correta é '+expected+'.');
@@ -366,7 +433,7 @@ function clickTube(i){
 
   save();to.push(from.pop());moves++;selected=null;render();
 
-  if(tubes[0].length===target.length){setTimeout(win,250)}
+  if(tubes[0].length===normalize(target).length){setTimeout(win,250)}
   else say('Boa! Continue liberando as letras corretas.')
 }
 function say(x){document.getElementById('message').textContent=x}
