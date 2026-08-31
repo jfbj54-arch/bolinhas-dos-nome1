@@ -149,6 +149,9 @@ h1{text-align:center;margin:6px 0}
   .ball{width:42px;height:42px;left:4px}
 }
 
+
+.memory-note{font-size:12px;opacity:.85;text-align:center;margin:6px auto 10px;max-width:520px}
+
 </style>
 </head>
 <body>
@@ -190,8 +193,8 @@ h1{text-align:center;margin:6px 0}
 
       <div class="target">
         <small>NOME DESTA FASE</small>
-        <b id="name"></b>
-      </div>
+        <b id="name">MONTE O NOME CORRETO</b>
+      </div><div class="memory-note">Você descobriu a resposta na charada. Agora monte o nome de memória.</div>
 
       <div class="preview" id="preview"></div>
       <div class="board" id="board"></div>
@@ -222,34 +225,24 @@ h1{text-align:center;margin:6px 0}
 const DATA=[
  {name:'JAQUELINE',hint:'Nome de uma menina que, quando assiste ao jogo do Cruzeiro, ele perde.'},
  {name:'JEFFERSON',hint:'Qual é o nome do rapaz que, quando assiste ao jogo do Cruzeiro, ele ganha?'},
- {name:'GABRIEL',hint:'Qual é o nome do rapaz que começa com G, termina com L e tem um anjo famoso com o mesmo nome?'},
- {name:'MARIA',hint:'Qual é o nome feminino de 5 letras, muito conhecido, que começa com M e termina com A?'},
- {name:'LUCAS',hint:'Qual é o nome do rapaz de 5 letras que começa com L e também é o nome de um livro da Bíblia?'},
- {name:'PEDRO',hint:'Qual é o nome do rapaz que começa com P e lembra um dos discípulos mais conhecidos de Jesus?'},
- {name:'AMANDA',hint:'Qual é o nome da menina de 6 letras que começa e termina com A e lembra alguém que é muito amada?'},
- {name:'MATEUS',hint:'Qual é o nome do rapaz de 6 letras que começa com M e também dá nome ao primeiro Evangelho do Novo Testamento?'},
- {name:'BEATRIZ',hint:'Qual é o nome da menina de 7 letras que começa com B e termina com Z?'},
- {name:'CARLOS',hint:'Qual é o nome do rapaz de 6 letras que começa com C e termina com S?'},
- {name:'JULIANA',hint:'Qual é o nome da menina de 7 letras que começa com J e termina com A?'},
- {name:'RODRIGO',hint:'Qual é o nome do rapaz de 7 letras que começa com R e termina com O?'},
- {name:'FERNANDA',hint:'Qual é o nome da menina de 8 letras que começa com F, tem duas letras A e termina com A?'},
- {name:'RAFAEL',hint:'Qual é o nome do rapaz de 6 letras que começa com R e também é conhecido como nome de arcanjo?'},
- {name:'VITORIA',hint:'Qual é o nome de uma menina que também é a palavra usada quando alguém vence uma disputa?'},
- {name:'ALESSANDRA',hint:'Qual é o nome feminino de 10 letras que começa com A, termina com A e tem duas letras S juntas?'},
- {name:'GUSTAVO',hint:'Qual é o nome do rapaz de 7 letras que começa com G e termina com O?'},
- {name:'ISABELA',hint:'Qual é o nome da menina de 7 letras que começa com I e termina com A?'},
- {name:'LEONARDO',hint:'Qual é o nome do rapaz de 8 letras que começa com L, termina com O e lembra o famoso artista da Vinci?'},
- {name:'MARIANA',hint:'Qual é o nome da menina de 7 letras que começa com M, termina com A e tem duas letras A?'},
- {name:'PATRICIA',hint:'Qual é o nome da menina de 8 letras que começa com P e termina com A?'},
- {name:'CAROLINA',hint:'Qual é o nome da menina de 8 letras que começa com C e termina com A?'},
- {name:'SAMUEL',hint:'Qual é o nome do rapaz de 6 letras que começa com S e também pertence a um profeta bíblico?'},
- {name:'DANIEL',hint:'Qual é o nome do rapaz de 6 letras que começa com D e lembra a história bíblica da cova dos leões?'},
- {name:'ESTER',hint:'Qual é o nome da mulher de 5 letras que começa com E e foi uma rainha na Bíblia?'},
- {name:'DAVI',hint:'Qual é o nome de 4 letras do jovem que enfrentou Golias?'},
- {name:'DEBORA',hint:'Qual é o nome feminino de 6 letras que começa com D e também pertence a uma juíza da Bíblia?'},
- {name:'RENATA',hint:'Qual é o nome da menina de 6 letras que começa com R e termina com A?'},
- {name:'WESLEY',hint:'Qual é o nome do rapaz de 6 letras que começa com W e termina com Y?'},
- {name:'CAMILA',hint:'Qual é o nome da menina de 6 letras que começa com C e termina com A?'}
+ {name:'MATHEUS PEREIRA',hint:'Qual é o nome do camisa 10 do Cruzeiro na temporada 2026/27?'},
+ {name:'KAIO JORGE',hint:'Qual é o nome do jogador que veste a camisa 19 do Cruzeiro na temporada 2026/27?'},
+ {name:'GERSON',hint:'Qual é o nome do jogador que veste a camisa 11 do Cruzeiro na temporada 2026/27?'},
+ {name:'LUCAS SILVA',hint:'Qual é o nome do jogador que veste a camisa 16 do Cruzeiro na temporada 2026/27?'},
+ {name:'LUCAS ROMERO',hint:'Qual é o nome do jogador que veste a camisa 29 do Cruzeiro na temporada 2026/27?'},
+ {name:'MATHEUS HENRIQUE',hint:'Qual é o nome do jogador que veste a camisa 8 do Cruzeiro na temporada 2026/27?'},
+ {name:'WILLIAM',hint:'Qual é o nome do jogador que veste a camisa 12 do Cruzeiro na temporada 2026/27?'},
+ {name:'FAGNER',hint:'Qual é o nome do jogador que veste a camisa 23 do Cruzeiro na temporada 2026/27?'},
+ {name:'SINISTERRA',hint:'Qual é o nome do jogador que veste a camisa 17 do Cruzeiro na temporada 2026/27?'},
+ {name:'MARQUINHOS',hint:'Qual é o nome do jogador que veste a camisa 7 do Cruzeiro na temporada 2026/27?'},
+ {name:'CHICO DA COSTA',hint:'Qual é o nome do jogador que veste a camisa 91 do Cruzeiro na temporada 2026/27?'},
+ {name:'ARROYO',hint:'Qual é o nome do jogador que veste a camisa 99 do Cruzeiro na temporada 2026/27?'},
+ {name:'KENJI',hint:'Qual é o nome do jogador que veste a camisa 70 do Cruzeiro na temporada 2026/27?'},
+ {name:'JOAO MARCELO',hint:'Qual é o nome do jogador que veste a camisa 43 do Cruzeiro na temporada 2026/27?'},
+ {name:'VILLALBA',hint:'Qual é o sobrenome do jogador do Cruzeiro que veste a camisa 25 na temporada 2026/27?'},
+ {name:'KAUA MORAES',hint:'Qual é o nome do jogador que veste a camisa 2 do Cruzeiro na temporada 2026/27?'},
+ {name:'FABRICIO BRUNO',hint:'Qual é o nome do jogador que veste a camisa 15 do Cruzeiro na temporada 2026/27?'},
+ {name:'NEISER VILLARREAL',hint:'Qual é o nome do jogador que veste a camisa 22 do Cruzeiro na temporada 2026/27?'}
 ];
 
 const colors=['#ef5350','#42a5f5','#66bb6a','#ffb52e','#ab47bc','#ff7043','#26c6da','#ec407a','#7e8cff','#9ccc65','#ffa726'];
