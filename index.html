@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bolinhas dos Nomes — Charadas</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Segoe UI,sans-serif}
+body{
+  background:
+    radial-gradient(circle at 20% 5%,#24516d 0,transparent 28%),
+    radial-gradient(circle at 80% 0,#30366d 0,transparent 24%),
+    linear-gradient(155deg,#07141f,#040a10);
+  color:#fff;padding:10px
+}
+.app{max-width:1080px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#0b2030;padding:12px 15px;border-radius:18px;border:1px solid #ffffff18}
+.title{font-weight:900;font-size:20px}
+.stats{display:flex;gap:7px;flex-wrap:wrap}
+.stat{background:#153349;padding:7px 10px;border-radius:999px;font-size:13px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+button{border:0;border-radius:12px;padding:10px 13px;background:#23465e;color:#fff;font-weight:800;cursor:pointer}
+button.primary{background:linear-gradient(135deg,#43ca90,#69e6ae);color:#08251a}
+button.gold{background:linear-gradient(135deg,#ffb943,#ffe079);color:#3a2807}
+.game{background:linear-gradient(160deg,#12364f,#091c2a 65%,#07141f);border:1px solid #ffffff16;border-radius:25px;padding:20px 12px;min-height:720px}
+.phase{text-align:center;color:#ffd45c;font-weight:900;font-size:13px}
+h1{text-align:center;margin:6px 0}
+.sub{text-align:center;color:#a7bdcb;font-size:13px}
+.target{max-width:650px;margin:16px auto;padding:13px;background:#06141f88;border-radius:16px;text-align:center}
+.target small{color:#9eb4c4}
+.target b{display:block;font-size:28px;letter-spacing:5px;margin-top:4px}
+.board{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;align-items:flex-end;margin:28px auto 15px;max-width:980px}
+.tube{width:82px;height:600px;border:5px solid #dceaf0aa;border-top:0;border-radius:0 0 30px 30px;position:relative;background:#ffffff08;cursor:pointer;transition:.15s}
+.tube.selected{transform:translateY(-12px);filter:drop-shadow(0 0 8px #63e1ac)}
+.tube.targetTube{border-color:#ffd45caa}
+.tube.targetTube:after{content:"NOME";position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffd45c;font-weight:900}
+.ball{position:absolute;left:9px;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:21px;font-weight:900;text-shadow:0 2px 3px #0008;box-shadow:inset -8px -9px 12px #0004,inset 7px 7px 10px #fff4,0 4px 7px #0005}
+.ball.extra{outline:2px solid rgba(255,255,255,.05)}
+.ball:after{content:"";position:absolute;width:15px;height:9px;border-radius:50%;background:#fff5;left:11px;top:9px}
+.message{text-align:center;min-height:25px;margin-top:38px;color:#d6e5ee;font-weight:700}
+.preview{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:14px auto;max-width:760px}
+.slot{width:42px;height:42px;border-radius:50%;border:2px dashed #ffffff30;display:grid;place-items:center;font-weight:900;color:#738d9e}
+.slot.ok{background:#27795c;border-style:solid;color:#fff}
+.progress{height:8px;max-width:620px;margin:10px auto;background:#0a2536;border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#4abaff,#58dda2);width:0}
+.help{max-width:780px;margin:14px auto;padding:11px;border-radius:14px;background:#0003;color:#afc4d2;text-align:center;font-size:12px}
+
+/* Charada */
+.riddleScreen{
+  max-width:760px;margin:18px auto 0;padding:22px;border-radius:22px;
+  background:linear-gradient(160deg,#102f45,#0a1d2b);
+  border:1px solid #ffffff18;box-shadow:0 18px 42px #0005;text-align:center
+}
+.riddleScreen.hidden{display:none}
+.riddleIcon{font-size:42px}
+.riddleTitle{font-size:24px;font-weight:900;margin:5px 0}
+.riddleHint{color:#c9d8e3;line-height:1.5;margin:12px auto;max-width:620px}
+.dots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:18px auto}
+.dot{
+  width:38px;height:46px;border-bottom:4px solid #ffd45c;
+  display:grid;place-items:center;font-size:23px;font-weight:900;color:#fff
+}
+.guessRow{display:flex;gap:8px;justify-content:center;max-width:520px;margin:auto}
+.guessRow input{
+  flex:1;min-width:0;border:1px solid #ffffff20;border-radius:12px;
+  background:#071822;color:#fff;padding:12px;font-size:16px;text-transform:uppercase
+}
+.riddleMsg{min-height:24px;margin-top:11px;font-weight:800;color:#ffd45c}
+.gameArea.hidden{display:none}
+
+.win{position:fixed;inset:0;background:#000c;display:none;place-items:center;z-index:10}
+.win.show{display:grid}
+.winbox{width:min(92vw,430px);background:#102c40;border-radius:23px;padding:27px;text-align:center}
+.winname{font-size:30px;color:#ffd45c;font-weight:900;letter-spacing:4px}
+
+@media(max-width:600px){
+  .top{align-items:flex-start}.title{font-size:16px}
+  .tube{width:63px;height:500px}.ball{width:43px;height:43px;left:5px;font-size:17px}
+  .board{gap:16px 9px}.target b{font-size:22px}.guessRow{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="title">🔤 Bolinhas dos Nomes</div>
+    <div class="stats">
+      <div class="stat">Fase <b id="level">1</b></div>
+      <div class="stat">👣 <b id="moves">0</b></div>
+      <div class="stat">⭐ <b id="score">0</b></div>
+    </div>
+  </div>
+
+  <div class="tools">
+    <button class="primary" id="restart">🔄 Reiniciar fase</button>
+    <button id="undo">↶ Desfazer</button>
+    <button id="hint">💡 Dica</button>
+  </div>
+
+  <main class="game">
+    <div class="phase">DESAFIO DOS NOMES</div>
+
+    <section class="riddleScreen" id="riddleScreen">
+      <div class="riddleIcon">❓</div>
+      <div class="riddleTitle">Descubra o nome</div>
+      <div class="sub">Acerte a charada para liberar as bolinhas.</div>
+      <div class="riddleHint" id="riddleHint"></div>
+      <div class="dots" id="dots"></div>
+      <div class="guessRow">
+        <input id="guessInput" maxlength="14" placeholder="Digite o nome">
+        <button class="gold" id="guessBtn">Responder</button>
+      </div>
+      <div class="riddleMsg" id="riddleMsg">Use a pista e a quantidade de letras.</div>
+    </section>
+
+    <section class="gameArea hidden" id="gameArea">
+      <h1>Junte o nome em um único tubo</h1>
+      <div class="sub">Agora existem letras extras para confundir. Só as letras certas formam o nome.</div>
+
+      <div class="target">
+        <small>NOME DESTA FASE</small>
+        <b id="name"></b>
+      </div>
+
+      <div class="preview" id="preview"></div>
+      <div class="board" id="board"></div>
+
+      <div class="message" id="message">Escolha um tubo para mover a bolinha de cima.</div>
+      <div class="progress"><span id="progress"></span></div>
+
+      <div class="help">
+        O <b>tubo dourado</b> recebe apenas as letras corretas, na ordem do nome.
+        As outras bolinhas são letras extras e servem para atrapalhar. Use os tubos auxiliares para liberar o caminho.
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="win" id="win">
+  <div class="winbox">
+    <div style="font-size:36px">🎉🏆🎉</div>
+    <h2>Fase concluída!</h2>
+    <div class="winname" id="winname"></div>
+    <p>Você resolveu a charada e montou o nome.</p>
+    <div style="font-size:32px">⭐⭐⭐</div><br>
+    <button class="primary" id="next">Próxima fase</button>
+  </div>
+</div>
+
+<script>
+const DATA=[
+ {name:'JAQUELINE',hint:'Nome de uma menina que, quando assiste ao jogo do Cruzeiro, ele perde.'},
+ {name:'JEFFERSON',hint:'Qual é o nome do rapaz que, quando assiste ao jogo do Cruzeiro, ele ganha?'},
+ {name:'GABRIEL',hint:'Qual é o nome do rapaz que começa com G, termina com L e tem um anjo famoso com o mesmo nome?'},
+ {name:'MARIA',hint:'Qual é o nome feminino de 5 letras, muito conhecido, que começa com M e termina com A?'},
+ {name:'LUCAS',hint:'Qual é o nome do rapaz de 5 letras que começa com L e também é o nome de um livro da Bíblia?'},
+ {name:'PEDRO',hint:'Qual é o nome do rapaz que começa com P e lembra um dos discípulos mais conhecidos de Jesus?'},
+ {name:'AMANDA',hint:'Qual é o nome da menina de 6 letras que começa e termina com A e lembra alguém que é muito amada?'},
+ {name:'MATEUS',hint:'Qual é o nome do rapaz de 6 letras que começa com M e também dá nome ao primeiro Evangelho do Novo Testamento?'},
+ {name:'BEATRIZ',hint:'Qual é o nome da menina de 7 letras que começa com B e termina com Z?'},
+ {name:'CARLOS',hint:'Qual é o nome do rapaz de 6 letras que começa com C e termina com S?'},
+ {name:'JULIANA',hint:'Qual é o nome da menina de 7 letras que começa com J e termina com A?'},
+ {name:'RODRIGO',hint:'Qual é o nome do rapaz de 7 letras que começa com R e termina com O?'},
+ {name:'FERNANDA',hint:'Qual é o nome da menina de 8 letras que começa com F, tem duas letras A e termina com A?'},
+ {name:'RAFAEL',hint:'Qual é o nome do rapaz de 6 letras que começa com R e também é conhecido como nome de arcanjo?'},
+ {name:'VITORIA',hint:'Qual é o nome de uma menina que também é a palavra usada quando alguém vence uma disputa?'},
+ {name:'ALESSANDRA',hint:'Qual é o nome feminino de 10 letras que começa com A, termina com A e tem duas letras S juntas?'},
+ {name:'GUSTAVO',hint:'Qual é o nome do rapaz de 7 letras que começa com G e termina com O?'},
+ {name:'ISABELA',hint:'Qual é o nome da menina de 7 letras que começa com I e termina com A?'},
+ {name:'LEONARDO',hint:'Qual é o nome do rapaz de 8 letras que começa com L, termina com O e lembra o famoso artista da Vinci?'},
+ {name:'MARIANA',hint:'Qual é o nome da menina de 7 letras que começa com M, termina com A e tem duas letras A?'},
+ {name:'PATRICIA',hint:'Qual é o nome da menina de 8 letras que começa com P e termina com A?'},
+ {name:'CAROLINA',hint:'Qual é o nome da menina de 8 letras que começa com C e termina com A?'},
+ {name:'SAMUEL',hint:'Qual é o nome do rapaz de 6 letras que começa com S e também pertence a um profeta bíblico?'},
+ {name:'DANIEL',hint:'Qual é o nome do rapaz de 6 letras que começa com D e lembra a história bíblica da cova dos leões?'},
+ {name:'ESTER',hint:'Qual é o nome da mulher de 5 letras que começa com E e foi uma rainha na Bíblia?'},
+ {name:'DAVI',hint:'Qual é o nome de 4 letras do jovem que enfrentou Golias?'},
+ {name:'DEBORA',hint:'Qual é o nome feminino de 6 letras que começa com D e também pertence a uma juíza da Bíblia?'},
+ {name:'RENATA',hint:'Qual é o nome da menina de 6 letras que começa com R e termina com A?'},
+ {name:'WESLEY',hint:'Qual é o nome do rapaz de 6 letras que começa com W e termina com Y?'},
+ {name:'CAMILA',hint:'Qual é o nome da menina de 6 letras que começa com C e termina com A?'}
+];
+
+const colors=['#ef5350','#42a5f5','#66bb6a','#ffb52e','#ab47bc','#ff7043','#26c6da','#ec407a','#7e8cff','#9ccc65','#ffa726'];
+const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+let level=Number(localStorage.getItem('bnc_level')||1);
+let score=Number(localStorage.getItem('bnc_score')||0);
+let target='',hintText='',tubes=[],selected=null,moves=0,history=[],riddleSolved=false;
+
+function mix(a){a=[...a];for(let i=a.length-1;i;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function extraCount(){
+  // difficulty rises with level: 3 extra letters initially, up to 10
+  return Math.min(10,3+Math.floor((level-1)/2))
+}
+function makeExtraLetters(n){
+  let arr=[];
+  for(let i=0;i<n;i++) arr.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
+  return arr
+}
+function newPhase(){
+  const data=DATA[(level-1)%DATA.length];
+  target=data.name;hintText=data.hint;moves=0;selected=null;history=[];riddleSolved=false;
+  document.getElementById('riddleScreen').classList.remove('hidden');
+  document.getElementById('gameArea').classList.add('hidden');
+  document.getElementById('guessInput').value='';
+  document.getElementById('riddleHint').textContent='🧩 Pista: '+hintText;
+  document.getElementById('riddleMsg').textContent='Use a pista e a quantidade de letras.';
+  renderDots();
+  document.getElementById('level').textContent=level;
+  document.getElementById('moves').textContent=moves;
+  document.getElementById('score').textContent=score;
+}
+function renderDots(){
+  const d=document.getElementById('dots');d.innerHTML='';
+  target.split('').forEach(()=>{let x=document.createElement('div');x.className='dot';x.textContent='•';d.appendChild(x)})
+}
+function normalize(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z]/g,'').toUpperCase()}
+function answerRiddle(){
+  const g=normalize(document.getElementById('guessInput').value);
+  if(!g){document.getElementById('riddleMsg').textContent='Digite um nome.';return}
+  if(g===target){
+    score+=25;localStorage.setItem('bnc_score',score);
+    document.getElementById('score').textContent=score;
+    document.getElementById('riddleMsg').textContent='✅ Acertou! Preparando as bolinhas...';
+    setTimeout(startBallGame,450)
+  }else{
+    document.getElementById('riddleMsg').textContent='❌ Não é esse nome. Tente novamente.';
+  }
+}
+function startBallGame(){
+  riddleSolved=true;
+  document.getElementById('riddleScreen').classList.add('hidden');
+  document.getElementById('gameArea').classList.remove('hidden');
+
+  const real=target.split('').map((l,i)=>({l,c:colors[(l.charCodeAt(0)+i)%colors.length],extra:false}));
+  const extras=makeExtraLetters(extraCount()).map((l,i)=>({l,c:colors[(i+target.length)%colors.length],extra:true}));
+  const balls=mix([...real,...extras]);
+
+  const helpers=Math.max(4,Math.min(7,Math.ceil(balls.length/3)));
+  tubes=Array.from({length:helpers+1},()=>[]);
+  balls.forEach((b,i)=>tubes[1+(i%helpers)].push(b));
+  tubes.slice(1).forEach(t=>t.sort(()=>Math.random()-.5));
+  render();
+  say('Agora ficou mais difícil: existem '+extraCount()+' letras extras.')
+}
+function save(){history.push(JSON.stringify({tubes,moves}));if(history.length>100)history.shift()}
+function correctCount(){
+  const t=tubes[0];let n=0;
+  for(let i=0;i<t.length;i++){if(t[i].l===target[i] && !t[i].extra)n++;else break}
+  return n
+}
+function render(){
+  document.getElementById('level').textContent=level;
+  document.getElementById('moves').textContent=moves;
+  document.getElementById('score').textContent=score;
+  document.getElementById('name').textContent=target;
+
+  const p=document.getElementById('preview');p.innerHTML='';const cc=correctCount();
+  target.split('').forEach((l,i)=>{let s=document.createElement('div');s.className='slot'+(i<cc?' ok':'');s.textContent=l;p.appendChild(s)});
+
+  const board=document.getElementById('board');board.innerHTML='';
+  tubes.forEach((t,ti)=>{
+    let d=document.createElement('div');
+    d.className='tube'+(ti===0?' targetTube':'')+(selected===ti?' selected':'');
+    d.onclick=()=>clickTube(ti);
+
+    t.forEach((b,bi)=>{
+      let x=document.createElement('div');
+      x.className='ball'+(b.extra?' extra':'');
+      x.textContent=b.l;
+      x.style.background=`linear-gradient(135deg,${b.c},#25364a)`;
+      let mob=innerWidth<=600,size=mob?43:54,gap=mob?6:9;
+      x.style.bottom=(gap+bi*(size+4))+'px';
+      d.appendChild(x)
+    });
+    board.appendChild(d)
+  });
+  document.getElementById('progress').style.width=(cc/target.length*100)+'%'
+}
+function clickTube(i){
+  if(selected===null){
+    if(!tubes[i].length)return say('Esse tubo está vazio.');
+    selected=i;render();say('Agora escolha o tubo de destino.');return
+  }
+  if(selected===i){selected=null;render();say('Seleção cancelada.');return}
+
+  let from=tubes[selected],to=tubes[i];
+  if(!from.length){selected=null;render();return}
+  const ball=from[from.length-1];
+
+  if(i===0){
+    const expected=target[tubes[0].length];
+    if(ball.extra || ball.l!==expected){
+      selected=null;render();
+      say('Essa bolinha não serve agora. A próxima letra correta é '+expected+'.');
+      return
+    }
+  } else if(to.length>=7){
+    selected=null;render();say('Esse tubo auxiliar está cheio.');return
+  }
+
+  save();to.push(from.pop());moves++;selected=null;render();
+
+  if(tubes[0].length===target.length){setTimeout(win,250)}
+  else say('Boa! Continue liberando as letras corretas.')
+}
+function say(x){document.getElementById('message').textContent=x}
+function undo(){
+  if(!riddleSolved)return;
+  if(!history.length)return say('Não há jogada para desfazer.');
+  let s=JSON.parse(history.pop());tubes=s.tubes;moves=s.moves;selected=null;render();say('Jogada desfeita.')
+}
+function hint(){
+  if(!riddleSolved){
+    document.getElementById('riddleMsg').textContent='💡 '+hintText;
+    return
+  }
+  let next=target[tubes[0].length];
+  for(let i=1;i<tubes.length;i++){
+    let t=tubes[i];
+    if(t.length){
+      let b=t[t.length-1];
+      if(!b.extra && b.l===next)return say('💡 A letra '+next+' está no topo do tubo '+(i+1)+'.')
+    }
+  }
+  say('💡 A próxima letra é '+next+'. Ela está escondida embaixo de outra bolinha.')
+}
+function win(){
+  score+=100;level++;
+  localStorage.setItem('bnc_level',level);localStorage.setItem('bnc_score',score);
+  document.getElementById('winname').textContent=target;
+  document.getElementById('win').classList.add('show');
+  document.getElementById('score').textContent=score
+}
+
+document.getElementById('guessBtn').onclick=answerRiddle;
+document.getElementById('guessInput').addEventListener('keydown',e=>{if(e.key==='Enter')answerRiddle()});
+document.getElementById('restart').onclick=()=>{if(riddleSolved)startBallGame();else newPhase()};
+document.getElementById('undo').onclick=undo;
+document.getElementById('hint').onclick=hint;
+document.getElementById('next').onclick=()=>{document.getElementById('win').classList.remove('show');newPhase()};
+window.addEventListener('resize',()=>{if(riddleSolved)render()});
+newPhase();
+</script>
+</body>
+</html>
