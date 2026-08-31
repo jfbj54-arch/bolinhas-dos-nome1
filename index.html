@@ -79,6 +79,76 @@ h1{text-align:center;margin:6px 0}
   .tube{width:63px;height:500px}.ball{width:43px;height:43px;left:5px;font-size:17px}
   .board{gap:16px 9px}.target b{font-size:22px}.guessRow{flex-direction:column}
 }
+
+/* ===== V9: otimização forte para celular ===== */
+@media(max-width:700px){
+  body{padding:4px}
+  .app{width:100%;max-width:none}
+  .top{
+    padding:9px 10px;border-radius:14px;
+    flex-direction:column;align-items:stretch;gap:8px
+  }
+  .title{text-align:center;font-size:17px}
+  .stats{justify-content:center;gap:5px}
+  .stat{font-size:12px;padding:6px 8px}
+  .tools{justify-content:center;gap:6px;margin:7px 0}
+  .tools button{padding:9px 10px;font-size:12px;flex:1;min-width:92px}
+  .game{padding:14px 5px 22px;border-radius:18px;min-height:0}
+  .phase{font-size:11px}
+  h1{font-size:21px;margin:5px 6px}
+  .sub{font-size:12px;line-height:1.35;padding:0 8px}
+  .target{margin:11px 6px 8px;padding:10px}
+  .target b{font-size:20px;letter-spacing:3px;overflow-wrap:anywhere}
+  .preview{gap:4px;margin:10px 5px}
+  .slot{width:32px;height:32px;font-size:14px}
+
+  /* No celular os tubos ficam em grade, sem estourar a tela */
+  .board{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    align-items:end;
+    justify-items:center;
+    gap:38px 4px;
+    width:100%;
+    max-width:430px;
+    margin:20px auto 12px;
+    padding:0 2px
+  }
+  .tube{
+    width:56px;
+    height:430px;
+    border-width:4px;
+    border-radius:0 0 23px 23px
+  }
+  .tube:before,.tube:after{height:3px}
+  .tube.selected{transform:translateY(-7px)}
+  .tube.targetTube:after{bottom:-25px;font-size:9px}
+  .ball{
+    width:40px;height:40px;left:4px;
+    font-size:16px
+  }
+  .ball:after{width:11px;height:7px;left:8px;top:7px}
+  .message{font-size:12px;margin:31px 7px 0;padding:0 4px}
+  .progress{margin:9px 10px}
+  .help{font-size:11px;line-height:1.4;margin:11px 6px;padding:9px}
+
+  .riddleScreen{margin:12px 5px 0;padding:16px 10px;border-radius:17px}
+  .riddleIcon{font-size:34px}
+  .riddleTitle{font-size:21px}
+  .riddleHint{font-size:13px;line-height:1.45}
+  .dots{gap:5px;margin:14px auto}
+  .dot{width:28px;height:38px;font-size:18px;border-bottom-width:3px}
+  .guessRow{flex-direction:column;gap:7px}
+  .guessRow input{font-size:16px;width:100%}
+  .guessRow button{width:100%;min-height:44px}
+  .riddleMsg{font-size:12px}
+}
+@media(max-width:390px){
+  .board{grid-template-columns:repeat(3,minmax(0,1fr));gap:38px 3px}
+  .tube{width:58px;height:430px}
+  .ball{width:42px;height:42px;left:4px}
+}
+
 </style>
 </head>
 <body>
@@ -271,7 +341,7 @@ function render(){
       x.className='ball'+(b.extra?' extra':'');
       x.textContent=b.l;
       x.style.background=`linear-gradient(135deg,${b.c},#25364a)`;
-      let mob=innerWidth<=600,size=mob?43:54,gap=mob?6:9;
+      let mob=innerWidth<=700,size=mob?40:54,gap=mob?7:9;
       x.style.bottom=(gap+bi*(size+4))+'px';
       d.appendChild(x)
     });
